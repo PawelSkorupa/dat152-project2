@@ -42,17 +42,49 @@ public class UserService {
 	}
 	
 	
-	// TODO public User saveUser(User user)
+	public User saveUser(User user) {
+		return userRepository.save(user);
+	}
 	
-	// TODO public void deleteUser(Long id) throws UserNotFoundException 
+	public void deleteUser(Long id) throws UserNotFoundException {
+		User user = userRepository.findById(id)
+				.orElseThrow(()-> new UserNotFoundException("User with id: " + id + " not found"));
+		userRepository.delete(user);
+	}
+
+	public User updateUser(Long id, User user) {
+		return userRepository.save(user);
+	}
 	
-	// TODO public User updateUser(User user, Long id)
+	public Set<Order> getUserOrders(Long userid) throws UserNotFoundException {
+		User user = userRepository.findById(userid)
+				.orElseThrow(()-> new UserNotFoundException("User with id: " + userid + " not found"));
+		return user.getOrders();
+	}
 	
-	// TODO public Set<Order> getUserOrders(Long userid) 
+	public Order getUserOrder(Long userid, Long oid) throws UserNotFoundException, OrderNotFoundException {
+		User user = userRepository.findById(userid)
+				.orElseThrow(()-> new UserNotFoundException("User with id: " + userid + " not found"));
+		return user.getOrders().stream().filter(order -> order.getId().equals(oid)).findFirst()
+				.orElseThrow(()-> new OrderNotFoundException("Order with id: " + oid + " not found"));
+	}
+
+	public void deleteOrderForUser(Long userid, Long oid) throws UserNotFoundException, OrderNotFoundException {
+		User user = userRepository.findById(userid)
+				.orElseThrow(()-> new UserNotFoundException("User with id: " + userid + " not found"));
+		Order order = user.getOrders().stream().filter(o -> o.getId().equals(oid)).findFirst()
+				.orElseThrow(()-> new OrderNotFoundException("Order with id: " + oid + " not found"));
+
+		user.getOrders().remove(order);
+		userRepository.save(user);
+	}
 	
-	// TODO public Order getUserOrder(Long userid, Long oid)
-	
-	// TODO public void deleteOrderForUser(Long userid, Long oid)
-	
-	// TODO public User createOrdersForUser(Long userid, Order order)
+	public Order createOrdersForUser(Long userid, Order order) throws UserNotFoundException {
+		User user = userRepository.findById(userid)
+				.orElseThrow(() -> new UserNotFoundException("User with id: " + userid + " not found"));
+
+		user.addOrder(order);
+		userRepository.save(user);
+		return order;
+	}
 }

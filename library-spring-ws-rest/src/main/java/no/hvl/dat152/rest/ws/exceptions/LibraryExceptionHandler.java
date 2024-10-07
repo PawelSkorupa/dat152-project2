@@ -56,7 +56,7 @@ public class LibraryExceptionHandler {
 	@ExceptionHandler(value = OrderNotFoundException.class)
 	public ResponseEntity<String> orderFailed(OrderNotFoundException ex) {
 		
-		return new ResponseEntity<>("An error occured: " + ex.getMessage(), HttpStatus.NOT_MODIFIED);
+		return new ResponseEntity<>("An error occured: " + ex.getMessage(), HttpStatus.NOT_FOUND);
 	}
 	
 	/**

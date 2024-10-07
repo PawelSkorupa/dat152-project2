@@ -6,6 +6,7 @@ package no.hvl.dat152.rest.ws.controller;
 import java.util.List;
 import java.util.Set;
 
+import no.hvl.dat152.rest.ws.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,16 +30,37 @@ import no.hvl.dat152.rest.ws.service.AuthorService;
 @RequestMapping("/elibrary/api/v1")
 public class AuthorController {
 
-	
-	// TODO - getAllAuthor (@Mappings, URI, and method)
-	
-	// TODO - getAuthor (@Mappings, URI, and method)
-	
-	// TODO - getBooksByAuthorId (@Mappings, URI, and method)
-	
-	// TODO - createAuthor (@Mappings, URI, and method)
-	
-	// TODO - updateAuthor (@Mappings, URI, and method)
+    @Autowired
+    AuthorService authorService;
 
+	@GetMapping(value = "/authors")
+	public ResponseEntity<Object> getAllAuthor() {
+        List<Author> authors = authorService.findAll();
 
+        if(authors.isEmpty())
+
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        else
+            return new ResponseEntity<>(authors, HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/authors/{id}")
+	public ResponseEntity<Object> getAuthor(@PathVariable("id") Long id) throws AuthorNotFoundException {
+        return new ResponseEntity<>(authorService.findById(id), HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/authors/{id}/books")
+	public ResponseEntity<?> getBooksByAuthorId(@PathVariable("id") Long id) throws AuthorNotFoundException {
+        return new ResponseEntity<>(authorService.findBooksByAuthorId(id), HttpStatus.OK);
+    }
+
+    @PostMapping(value = "/authors")
+	public ResponseEntity<Object> createAuthor(@RequestBody Author author) {
+        return new ResponseEntity<>(authorService.saveAuthor(author), HttpStatus.CREATED);
+    }
+
+    @PutMapping(value = "/authors/{id}")
+	public ResponseEntity<Object> updateAuthor(@PathVariable("id") int id, @RequestBody Author author) {
+        return new ResponseEntity<>(authorService.updateAuthor(id, author), HttpStatus.OK);
+    }
 }

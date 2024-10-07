@@ -37,7 +37,7 @@ class TestOrder {
 				.get(API_ROOT+"/orders");
 		
 		assertEquals(HttpStatus.OK.value(), response.getStatusCode());
-		assertTrue(response.jsonPath().getList("isbn").size() > 0);
+		assertTrue(response.jsonPath().getList("content.isbn").size() > 0);
 	}
 	
 	@DisplayName("JUnit test for Paging @GetMapping(/orders) endpoint")
@@ -50,7 +50,7 @@ class TestOrder {
 				.get(API_ROOT+"/orders");
 		
 		assertEquals(HttpStatus.OK.value(), response.getStatusCode());
-		assertTrue(response.jsonPath().getList("isbn").size() == 2);
+		assertTrue(response.jsonPath().getList("content.isbn").size() == 2);
 	}
 	
 	@DisplayName("JUnit test for @GetMapping(/orders/{id}) endpoint")

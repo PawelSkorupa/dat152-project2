@@ -6,6 +6,8 @@ package no.hvl.dat152.rest.ws.service;
 import java.util.List;
 import java.util.Set;
 
+import no.hvl.dat152.rest.ws.exceptions.UserNotFoundException;
+import no.hvl.dat152.rest.ws.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -22,7 +24,6 @@ public class AuthorService {
 
 	@Autowired
 	private AuthorRepository authorRepository;
-		
 	
 	public Author findById(long id) throws AuthorNotFoundException {
 		
@@ -32,17 +33,27 @@ public class AuthorService {
 		return author;
 	}
 	
-	// TODO public saveAuthor(Author author)
-		
+	public Author saveAuthor(Author author) {
+		return authorRepository.save(author);
+	}
 	
-	// TODO public Author updateAuthor(Author author, int id)
-		
+	public Author updateAuthor(int id, Author author) {
+		return authorRepository.save(author);
+	}
 	
-	// TODO public List<Author> findAll()
+	public List<Author> findAll() {
+		return (List<Author>) authorRepository.findAll();
+	}
 	
+	public void deleteById(Long id) throws AuthorNotFoundException {
+		Author author = authorRepository.findById(id)
+				.orElseThrow(()-> new AuthorNotFoundException("Author with id: " + id + " not found"));
+		authorRepository.delete(author);
+	}
 	
-	// TODO public void deleteById(Long id) throws AuthorNotFoundException 
-
-	
-	// TODO public Set<Book> findBooksByAuthorId(Long id)
+	public Set<Book> findBooksByAuthorId(Long id) throws AuthorNotFoundException {
+		Author author = authorRepository.findById(id)
+				.orElseThrow(()-> new AuthorNotFoundException("Author with id: " + id + " not found"));
+		return author.getBooks();
+	}
 }
