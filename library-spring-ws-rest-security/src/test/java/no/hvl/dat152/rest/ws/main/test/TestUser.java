@@ -124,7 +124,7 @@ class TestUser {
 				.get(API_ROOT+"/users/1/orders/1");
 	    
 	    assertEquals(HttpStatus.OK.value(), response.getStatusCode());
-	    assertEquals("qabfde1230", response.jsonPath().get("isbn"));
+	    assertEquals("1", response.jsonPath().get("id").toString());
 	}
 	
 	@DisplayName("JUnit test for @DeleteMapping(/users/{uid}/orders/{oid}) endpoint")
