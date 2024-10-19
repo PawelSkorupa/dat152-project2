@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package no.hvl.dat152.rest.ws.security;
 
@@ -24,31 +24,36 @@ import org.springframework.security.web.SecurityFilterChain;
 @Configuration
 @EnableMethodSecurity
 public class ApplicationSecurity {
-	
+
 	@Autowired
 	private AuthTokenFilter authTokenFilter;
-	
+
 	@Bean
 	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-		
-		http.csrf(csrf->csrf.disable());
-		http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
-		http.authorizeHttpRequests(authorize -> 
-				authorize.anyRequest().authenticated());
-		http.oauth2ResourceServer(oauth2 -> oauth2
-				.jwt(jwtconfig -> jwtconfig.jwtAuthenticationConverter(jwt -> {
-					Map<String, Collection<String>> realmAccess = jwt.getClaim("realm_access");
-					Collection<String> roles = realmAccess.get("roles");
-					var grantedAuthorities = roles.stream()
-							.map(role -> new SimpleGrantedAuthority(role))
-							.collect(Collectors.toList());
-					
-					return new JwtAuthenticationToken(jwt,grantedAuthorities);
-				})));
+
+		http.csrf(csrf -> csrf.disable())
+				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+				.authorizeHttpRequests(authorize ->
+						authorize.anyRequest().authenticated())
+				.oauth2ResourceServer(oauth2 -> oauth2
+						.jwt(jwtconfig -> jwtconfig.jwtAuthenticationConverter(jwt -> {
+							Map<String, Collection<String>> realmAccess = jwt.getClaim("realm_access");
+							Collection<String> roles = realmAccess.get("roles");
+							var grantedAuthorities = roles.stream()
+									.map(role -> new SimpleGrantedAuthority(role))
+									.collect(Collectors.toList());
+
+							return new JwtAuthenticationToken(jwt, grantedAuthorities);
+						})))
+				.headers(headers -> headers.httpStrictTransportSecurity(hsts ->
+						hsts.disable() // Disable HSTS for testing
+				));
+
 		http.addFilterAfter(authTokenFilter, BearerTokenAuthenticationFilter.class);
-		
-		return http.build();		
+
+		return http.build();
 	}
 
-	
+
+
 }

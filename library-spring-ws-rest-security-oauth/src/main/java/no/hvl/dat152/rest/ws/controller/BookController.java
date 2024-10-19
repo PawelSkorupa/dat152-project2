@@ -37,6 +37,48 @@ import no.hvl.dat152.rest.ws.service.BookService;
 @RequestMapping("/elibrary/api/v1")
 public class BookController {
 
-	// TODO authority annotation
+    @Autowired
+    private BookService bookService;
 
+    @PreAuthorize("hasAuthority('USER')")
+    @GetMapping("/books")
+    public ResponseEntity<Object> getAllBooks(){
+        List<Book> books = bookService.findAll();
+        if(books.isEmpty())
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        return new ResponseEntity<>(books, HttpStatus.OK);
+    }
+
+    @PreAuthorize("hasAuthority('USER')")
+    @GetMapping("/books/{isbn}")
+    public ResponseEntity<Object> getBook(@PathVariable("isbn") String isbn) throws BookNotFoundException {
+        Book book = bookService.findByISBN(isbn);
+        return new ResponseEntity<>(book, HttpStatus.OK);
+    }
+
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @PostMapping("/books")
+    public ResponseEntity<Book> createBook(@RequestBody Book book){
+        Book nbook = bookService.saveBook(book);
+        return new ResponseEntity<>(nbook, HttpStatus.CREATED);
+    }
+
+    @PreAuthorize("hasAuthority('USER')")
+    @GetMapping(value = "/books/{isbn}/authors")
+    public ResponseEntity<?> getAuthorsOfBookByISBN(@PathVariable("isbn") String isbn) throws BookNotFoundException {
+        return new ResponseEntity<>(bookService.findAuthorsOfBookByISBN(isbn), HttpStatus.OK);
+    }
+
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @PutMapping(value = "/books/{isbn}")
+    public ResponseEntity<Book> updateBookByISBN(@PathVariable("isbn") String isbn, @RequestBody Book book) {
+        return new ResponseEntity<>(bookService.updateBook(book, isbn), HttpStatus.OK);
+    }
+
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @DeleteMapping(value = "/books/{isbn}")
+    public ResponseEntity<?> deleteBookByISBN(@PathVariable("isbn") String isbn) throws BookNotFoundException {
+        bookService.deleteByISBN(isbn);
+        return new ResponseEntity<>(null, HttpStatus.OK);
+    }
 }

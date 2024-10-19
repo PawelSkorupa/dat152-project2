@@ -30,6 +30,41 @@ import no.hvl.dat152.rest.ws.service.AuthorService;
 @RequestMapping("/elibrary/api/v1")
 public class AuthorController {
 
-	// TODO authority annotation
+    @Autowired
+    AuthorService authorService;
 
+    @PreAuthorize("hasAuthority('USER')")
+    @GetMapping(value = "/authors")
+    public ResponseEntity<Object> getAllAuthor() {
+        List<Author> authors = authorService.findAll();
+        if(authors.isEmpty())
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        else
+            return new ResponseEntity<>(authors, HttpStatus.OK);
+    }
+
+    @PreAuthorize("hasAuthority('USER')")
+    @GetMapping(value = "/authors/{id}")
+    public ResponseEntity<Object> getAuthor(@PathVariable("id") Long id) throws AuthorNotFoundException {
+        return new ResponseEntity<>(authorService.findById(id), HttpStatus.OK);
+    }
+
+    @PreAuthorize("hasAuthority('USER')")
+    @GetMapping(value = "/authors/{id}/books")
+    public ResponseEntity<?> getBooksByAuthorId(@PathVariable("id") Long id) throws AuthorNotFoundException {
+        return new ResponseEntity<>(authorService.findBooksByAuthorId(id), HttpStatus.OK);
+    }
+
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @PostMapping(value = "/authors")
+    public ResponseEntity<Object> createAuthor(@RequestBody Author author) {
+        return new ResponseEntity<>(authorService.saveAuthor(author), HttpStatus.CREATED);
+    }
+
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @PutMapping(value = "/authors/{id}")
+    public ResponseEntity<Object> updateAuthor(@PathVariable("id") int id, @RequestBody Author author) {
+        return new ResponseEntity<>(authorService.updateAuthor(id, author), HttpStatus.OK);
+    }
 }
+

@@ -20,8 +20,61 @@ import no.hvl.dat152.rest.ws.repository.BookRepository;
 /**
  * @author tdoy
  */
+
 @Service
 public class BookService {
 
-	// TODO copy your solutions from previous tasks!
+    @Autowired
+    private BookRepository bookRepository;
+
+
+    public Book saveBook(Book book) {
+
+        return bookRepository.save(book);
+
+    }
+
+    public List<Book> findAll(){
+
+        return (List<Book>) bookRepository.findAll();
+
+    }
+
+
+    public Book findByISBN(String isbn) throws BookNotFoundException {
+
+        Book book = bookRepository.findByIsbn(isbn)
+                .orElseThrow(() -> new BookNotFoundException("Book with isbn = "+isbn+" not found!"));
+
+        return book;
+    }
+
+    public Book updateBook(Book book, String isbn) {
+        return bookRepository.save(book);
+    }
+
+    // TODO public List<Book> findAllPaginate(Pageable page)
+
+    public Set<Author> findAuthorsOfBookByISBN(String isbn) throws BookNotFoundException {
+        Book book = bookRepository.findBookByISBN(isbn);
+        if (book == null) {
+            throw new BookNotFoundException("Book with isbn: " + isbn + " not found");
+        }
+        return book.getAuthors();
+    }
+
+    public void deleteById(long id) throws BookNotFoundException {
+        Book book = bookRepository.findById(id)
+                .orElseThrow(() -> new BookNotFoundException("Book with id: " + id + " not found"));
+        bookRepository.delete(book);
+    }
+
+    public void deleteByISBN(String isbn) throws BookNotFoundException {
+        Book book = bookRepository.findBookByISBN(isbn);
+        if (book == null) {
+            throw new BookNotFoundException("Book with isbn: " + isbn + " not found");
+        }
+        bookRepository.delete(book);
+    }
 }
+

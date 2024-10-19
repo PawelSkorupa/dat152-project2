@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package no.hvl.dat152.rest.ws.controller;
 
@@ -18,35 +18,33 @@ import org.springframework.web.bind.annotation.RestController;
 import no.hvl.dat152.rest.ws.exceptions.UserNotFoundException;
 import no.hvl.dat152.rest.ws.model.User;
 import no.hvl.dat152.rest.ws.service.AdminUserService;
-
-/**
- * @author tdoy
- */
 @RestController
 @RequestMapping("/elibrary/api/v1/admin")
 public class AdminUserController {
 
 	@Autowired
 	private AdminUserService userService;
-	
+
 	@PutMapping("/users/{id}")
-	// TODO authority annotation
-	public ResponseEntity<Object> updateUserRole(@PathVariable("id") Long id, @RequestParam("role") String role) 
-			throws UserNotFoundException{
-		
-		// TODO
-		
-		return null;
+	@PreAuthorize("hasAuthority('SUPER_ADMIN')")
+	public ResponseEntity<Object> updateUserRole(@PathVariable("id") Long id, @RequestParam("role") String role)
+			throws UserNotFoundException {
+
+		User updatedUser = userService.updateUserRole(id, role);
+
+		return new ResponseEntity<>(updatedUser, HttpStatus.OK);
 	}
-	
+
+
 	@DeleteMapping("/users/{id}")
-	// TODO authority annotation
-	public ResponseEntity<Object> deleteUserRole(@PathVariable("id") Long id, 
-			@RequestParam("role") String role) throws UserNotFoundException{
-		
-		// TODO
-		
-		return null;
+	@PreAuthorize("hasAuthority('SUPER_ADMIN')")
+	public ResponseEntity<Object> revokeUserRole(@PathVariable("id") Long id, @RequestParam("role") String role)
+			throws UserNotFoundException {
+
+		User updatedUser = userService.revokeRoleFromUser(id, role);
+
+		return new ResponseEntity<>(updatedUser, HttpStatus.OK);
 	}
-	
+
 }
+
